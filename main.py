@@ -1,6 +1,6 @@
 import models
 from models import MixupMode
-import data_loader
+import dataloaders
 import visualizer
 import time
 

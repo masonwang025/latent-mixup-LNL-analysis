@@ -1,12 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import tensorflow as tf
+import torch
 import utils
 from collections import defaultdict
 
 
 def plot_bottleneck_representation(bottleneck_representation, y):
-    bottleneck_x, bottleneck_y = tf.transpose(bottleneck_representation)
+    bottleneck_x, bottleneck_y = torch.transpose(bottleneck_representation)
     plt.scatter(bottleneck_x, bottleneck_y, c=y)
     plt.show()
 
@@ -34,7 +34,7 @@ def compare_svd_for_b12_models(models, x, y, classes=range(10), bottleneck_layer
         for c in classes:
             bottleneck_rep_c, _ = utils.get_hidden_representation_for_class(
                 bottleneck_representation, y, [c])
-            s, _, _ = tf.linalg.svd(bottleneck_rep_c)
+            s, _, _ = torch.linalg.svd(bottleneck_rep_c)
             class_to_svd[c][model.name] = s
 
     for c in classes:
@@ -62,7 +62,7 @@ def plot_spiral_model_confidence(model, x_train, y_train, title='spiral model'):
     y = model(x_sample)
 
     # get P(Y=1|X)
-    confidence = tf.transpose(tf.math.softmax(y))[1].numpy()
+    confidence = torch.transpose(torch.nn.funtional.softmax(y))[1].numpy()
     confidence = confidence.reshape((len(xi), len(xj)))
     x, y = np.meshgrid(xi, xj)
 
@@ -82,3 +82,25 @@ def plot_spiral_model_confidence(model, x_train, y_train, title='spiral model'):
     plt.plot(x_d0_l1, x_d1_l1, '.', label='class 1')
     plt.colorbar()
     plt.show()
+
+
+def one_hot_to_index_vector(v):
+    return np.argmax(v, axis=1)
+
+
+def get_activation_from_layer(model, layer_name, inputs):
+    activation = inputs
+    for layer in model.layers:
+        activation = layer(activation)
+        if layer.name == layer_name:
+            break
+    return activation.numpy()
+
+
+def get_hidden_representation_for_class(bottleneck_representation, y, c, subset=None):
+    indices = [i for i, y_i in enumerate(y) if y_i in c]
+    indices = indices[:subset] if subset else indices
+    y = torch.gather(y, indices)
+    bottleneck_representation = torch.gather(bottleneck_representation, indices)
+    return bottleneck_representation, y
+
