@@ -3,7 +3,7 @@ from torchvision import datasets, transforms
 import numpy as np
 import copy
 
-def get_spiral_datasets(dir):
+def get_spiral_datasets(dir=''):
     trainset = SpiralDataset(dir, train=True)
     trainset_track = SpiralDataset(dir, train=True)
     testset = SpiralDataset(dir, train=False)

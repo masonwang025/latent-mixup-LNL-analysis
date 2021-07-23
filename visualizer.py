@@ -55,7 +55,9 @@ def plot_spiral_dataset(x, y):
     plt.show()
 
 
-def plot_spiral_model_confidence(model, x_train, y_train, title='spiral model'):
+def plot_spiral_model_confidence(model, train_loader, title='spiral model'):
+    x_train, y_train = next(iter(train_loader))
+    
     xi = np.arange(-15, 15, 0.1)
     xj = np.arange(-15, 15, 0.1)
     x_sample = np.array([[j, i] for i in xi for j in xj])
@@ -85,7 +87,7 @@ def plot_spiral_model_confidence(model, x_train, y_train, title='spiral model'):
 
 
 def one_hot_to_index_vector(v):
-    return np.argmax(v, axis=1)
+    return np.argmax(v, axis=0)
 
 
 def get_activation_from_layer(model, layer_name, inputs):
