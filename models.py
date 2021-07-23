@@ -15,12 +15,13 @@ class MixupMode(enum.Enum):
 
 class SpiralModel(nn.Module):
     def __init__(self):
-        self.layer1 = nn.Sequential(nn.Linear(1024, 1024), torch.LeakyReLU(negative_slope=LEAKY_RELU_ALPHA))
-        self.layer2 = nn.Sequential(nn.Linear(1024, 1024), torch.LeakyReLU(negative_slope=LEAKY_RELU_ALPHA))
-        self.layer3 = nn.Sequential(nn.Linear(1024, 1024), torch.LeakyReLU(negative_slope=LEAKY_RELU_ALPHA))
-        self.layer4 = nn.Sequential(nn.Linear(1024, 1024), torch.LeakyReLU(negative_slope=LEAKY_RELU_ALPHA))
-        self.layer5 = nn.Sequential(nn.Linear(1024, 1024), torch.LeakyReLU(negative_slope=LEAKY_RELU_ALPHA))
-        self.layer6 = nn.Sequential(nn.Linear(1024, 2), torch.LeakyReLU(negative_slope=LEAKY_RELU_ALPHA))
+        super().__init__()
+        self.layer1 = nn.Sequential(nn.Linear(2, 256), torch.nn.LeakyReLU(negative_slope=LEAKY_RELU_ALPHA))
+        self.layer2 = nn.Sequential(nn.Linear(256, 1024), torch.nn.LeakyReLU(negative_slope=LEAKY_RELU_ALPHA))
+        self.layer3 = nn.Sequential(nn.Linear(1024, 1024), torch.nn.LeakyReLU(negative_slope=LEAKY_RELU_ALPHA))
+        self.layer4 = nn.Sequential(nn.Linear(1024, 1024), torch.nn.LeakyReLU(negative_slope=LEAKY_RELU_ALPHA))
+        self.layer5 = nn.Sequential(nn.Linear(1024, 1024), torch.nn.LeakyReLU(negative_slope=LEAKY_RELU_ALPHA))
+        self.layer6 = nn.Sequential(nn.Linear(1024, 2), torch.nn.LeakyReLU(negative_slope=LEAKY_RELU_ALPHA))
     
     def forward(self, x, *, target=None, mixup=False, mixup_hidden=False, mixup_alpha=None, mixup_data=None, device='cuda'):
         if mixup_hidden:
@@ -29,8 +30,8 @@ class SpiralModel(nn.Module):
             layer_mix = 0
         else:
             layer_mix = None
-
-        out = torch.reshape(x, (-1, 1024))
+        
+        out = x.float()
 
         if layer_mix == 0:
             out, targets_a, targets_b, lam, index = mixup_data(

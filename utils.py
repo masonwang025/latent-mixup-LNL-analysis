@@ -98,7 +98,7 @@ def track_training_loss(args, model, device, train_loader, epoch, bmm_model1, bm
         prediction = model(data)
 
         prediction = F.log_softmax(prediction, dim=1)
-        idx_loss = F.nll_loss(prediction, target, reduction='none')
+        idx_loss = F.nll_loss(prediction, target.long(), reduction='none')
         idx_loss.detach_()
         all_losses = torch.cat((all_losses, idx_loss.cpu()))
         probs = prediction.clone()
@@ -205,7 +205,7 @@ def mixup_data(x, y, *, alpha=1.0, device='cuda'):
 
 def mixup_criterion(pred, y_a, y_b, lam):
 
-    return lam * F.nll_loss(pred, y_a) + (1 - lam) * F.nll_loss(pred, y_b)
+    return lam * F.nll_loss(pred, y_a.long()) + (1 - lam) * F.nll_loss(pred, y_b.long())
 
 
 def train_mixUp(args, model, device, train_loader, optimizer, epoch, alpha, *, hidden_mixup=False):
@@ -304,14 +304,14 @@ def train_mixUp_HardBootBeta(args, model, device, train_loader, optimizer, epoch
         z1 = torch.max(output_x1, dim=1)[1]
         z2 = torch.max(output_x2, dim=1)[1]
 
-        loss_x1_vec = (1 - B) * F.nll_loss(output, targets_1, reduction='none')
+        loss_x1_vec = (1 - B) * F.nll_loss(output, targets_1.long(), reduction='none')
         loss_x1 = torch.sum(loss_x1_vec) / len(loss_x1_vec)
 
         loss_x1_pred_vec = B * F.nll_loss(output, z1, reduction='none')
         loss_x1_pred = torch.sum(loss_x1_pred_vec) / len(loss_x1_pred_vec)
 
         loss_x2_vec = (1 - B2) * F.nll_loss(output,
-                                            targets_2, reduction='none')
+                                            targets_2.long(), reduction='none')
         loss_x2 = torch.sum(loss_x2_vec) / len(loss_x2_vec)
 
         loss_x2_pred_vec = B2 * F.nll_loss(output, z2, reduction='none')
@@ -355,7 +355,7 @@ def compute_probabilities_batch(data, target, cnn_model, bmm_model, bmm_model_ma
     cnn_model.eval()
     outputs = cnn_model(data)
     outputs = F.log_softmax(outputs, dim=1)
-    batch_losses = F.nll_loss(outputs.float(), target, reduction='none')
+    batch_losses = F.nll_loss(outputs.float(), target.long(), reduction='none')
     batch_losses.detach_()
     outputs.detach_()
     cnn_model.train()
@@ -382,8 +382,8 @@ def test_cleaning(args, model, device, test_loader):
             data, target = data.to(device), target.to(device)
             output = model(data)
             output = F.log_softmax(output, dim=1)
-            test_loss += F.nll_loss(output, target, reduction='sum').item()
-            loss_per_batch.append(F.nll_loss(output, target).item())
+            test_loss += F.nll_loss(output, target.long(), reduction='sum').item()
+            loss_per_batch.append(F.nll_loss(output, target.long()).item())
             # get the index of the max log-probability
             pred = output.max(1, keepdim=True)[1]
             correct += pred.eq(target.view_as(pred)).sum().item()

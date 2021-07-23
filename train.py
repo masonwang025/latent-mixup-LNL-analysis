@@ -1,4 +1,3 @@
-# from __future__ import print_function
 from utils import *
 from datasets import *
 import argparse
@@ -8,7 +7,6 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 import torch.nn.functional as F
-import PreResNet
 import math
 import random
 import os
@@ -29,6 +27,8 @@ def main():
     # Training settings
     parser = argparse.ArgumentParser(
         description='Analyzing hidden states when training with mixup on latent representations for LNL.')
+    parser.add_argument('--root-dir', type=str, default='.',
+                        help='path to where datasets located. If the datasets are not downloaded, they will automatically be and extracted to this path, default: .')
     parser.add_argument('--batch-size', type=int, default=128,
                         help='input batch size for training, default: 128')
     parser.add_argument('--test-batch-size', type=int, default=100,
@@ -82,22 +82,24 @@ def main():
 
     model = None
 
-    if args.dataset == 'Spiral':
+    num_classes = None
+    if args.dataset == 'spiral':
         trainset, trainset_track, testset = get_spiral_datasets(args.root_dir)
         model = models.SpiralModel().to(device)
-    # elif args.dataset == 'MNIST':
+        num_classes = 2
+    # elif args.dataset == 'mnist':
     #     train_loader, train_loader_track, test_loader = get_mnist_loaders(args.root_dir,
     #                                                                       args.batch_size, args.test_batch_size)
     #     model = models.MNISTModel().to(device)
     else:
         raise NotImplementedError
-    
+
     train_loader = torch.utils.data.DataLoader(
         trainset, batch_size=args.batch_size, shuffle=True, num_workers=1, pin_memory=True)
     train_loader_track = torch.utils.data.DataLoader(
         trainset_track, batch_size=args.batch_size, shuffle=False, num_workers=1, pin_memory=True)
     test_loader = torch.utils.data.DataLoader(
-        testset, batch_size=args.test_batch_size, shuffle=False, num_workers=1, pin_memory=True)    
+        testset, batch_size=args.test_batch_size, shuffle=False, num_workers=1, pin_memory=True)
 
     milestones = args.M
 
@@ -128,9 +130,8 @@ def main():
     bmm_model = bmm_model_maxLoss = bmm_model_minLoss = cont = k = 0
 
     # the +1 is because the conditions are defined as ">" or "<" not ">="
-    bootstrap_ep_std = milestones[0] + 5 + 1 
+    bootstrap_ep_std = milestones[0] + 5 + 1
     bootstrap_ep_mixup = milestones[0] + 5 + 1
-
 
     for epoch in range(1, args.epochs + 1):
         # train
@@ -156,22 +157,22 @@ def main():
                 print("\t##### Doing HARD BETA bootstrapping and NORMAL mixup from the epoch {0} #####".format(
                     bootstrap_ep_mixup))
                 loss_per_epoch, acc_train_per_epoch_i = train_mixUp_HardBootBeta(args, model, device, train_loader, optimizer, epoch,
-                                                                                alpha, bmm_model, bmm_model_maxLoss, bmm_model_minLoss, args.reg_term, num_classes)                                                                                     alpha, bmm_model, bmm_model_maxLoss, bmm_model_minLoss, args.reg_term, num_classes)
+                                                                                     alpha, bmm_model, bmm_model_maxLoss, bmm_model_minLoss, args.reg_term, num_classes)
 
         ### Hidden State Mixup ###
         if args.Mixup == "Hidden":
-            alpha = args.alpha
+            alpha=args.alpha
             if epoch < bootstrap_ep_mixup:
                 print('\t##### Doing HIDDEN mixup for {0} epochs #####'.format(
                     bootstrap_ep_mixup - 1))
-                loss_per_epoch, acc_train_per_epoch_i = train_mixUp(
-                    args, model, device, train_loader, optimizer, epoch, 32, hidden_mixup=True)
+                loss_per_epoch, acc_train_per_epoch_i=train_mixUp(
+                    args, model, device, train_loader, optimizer, epoch, 32, hidden_mixup = True)
 
             else:
                 print("\t##### Doing HARD BETA bootstrapping and HIDDEN mixup from the epoch {0} #####".format(
                     bootstrap_ep_mixup))
-                loss_per_epoch, acc_train_per_epoch_i = train_mixUp_HardBootBeta(args, model, device, train_loader, optimizer, epoch,
-                                                                                 alpha, bmm_model, bmm_model_maxLoss, bmm_model_minLoss, args.reg_term, num_classes, hidden_mixup=True)
+                loss_per_epoch, acc_train_per_epoch_i=train_mixUp_HardBootBeta(args, model, device, train_loader, optimizer, epoch,
+                                                                                 alpha, bmm_model, bmm_model_maxLoss, bmm_model_minLoss, args.reg_term, num_classes, hidden_mixup = True)
 
 
         # tensorboard
@@ -181,8 +182,7 @@ def main():
             tb.flush()
 
         # Training tracking loss
-        epoch_losses_train, epoch_probs_train, argmaxXentropy_train, bmm_model, bmm_model_maxLoss, bmm_model_minLoss = \
-            track_training_loss(args, model, device, train_loader_track,
+        epoch_losses_train, epoch_probs_train, argmaxXentropy_train, bmm_model, bmm_model_maxLoss, bmm_model_minLoss=track_training_loss(args, model, device, train_loader_track,
                                 epoch, bmm_model, bmm_model_maxLoss, bmm_model_minLoss)
 
         # test

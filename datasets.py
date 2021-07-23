@@ -1,13 +1,13 @@
 import torch
 from torchvision import datasets, transforms
 import numpy as np
+import copy
 
 def get_spiral_datasets(dir):
-    full_dataset = SpiralsDataset(dir)
-    train_size = int(0.8 * len(full_dataset))
-    test_size = len(full_dataset) - train_size
-    train_dataset, test_dataset = torch.utils.data.random_split(full_dataset, [train_size, test_size])
-    return train_dataset, torch.clone(train_dataset), test_dataset
+    trainset = SpiralDataset(dir, train=True)
+    trainset_track = SpiralDataset(dir, train=True)
+    testset = SpiralDataset(dir, train=False)
+    return trainset, trainset_track, testset
 
 def get_mnist_datasets(dir):
     trainset = datasets.MNIST(
@@ -19,12 +19,19 @@ def get_mnist_datasets(dir):
     return trainset, trainset_track, testset
 
 class SpiralDataset(torch.utils.data.Dataset):
-    def __init__(self, n_points, noise=0.5):
-        self.x, self.y = generate_two_spirals_dataset(n_points, noise=noise)
-        self.indices = np.random.shuffle(torch.range(self.x.shape[0]))
+    def __init__(self, dir, n_points=2000, noise=0.5, train=True):
+        super().__init__()
+        self.data, self.targets = generate_two_spirals_dataset(n_points, noise=noise)
+        self.indices = torch.arange(0, self.data.shape[0])
+        np.random.shuffle(self.indices)
+
+        if train:
+            self.indices = self.indices[:int(0.8 * len(self.indices))]
+        else:
+            self.indices = self.indices[int(0.8 * len(self.indices)):]
 
     def __getitem__(self, index):
-        return self.x[self.indices[index]], self.y[self.indices[index]]
+        return self.data[self.indices[index]], self.targets[self.indices[index]]
 
     def __len__(self):
         return len(self.indices)
