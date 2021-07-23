@@ -8,5 +8,5 @@ bash TrainSpiral.sh
 ```
 
 ```
-tensorboard --logdir=tensorboard/runs-0
+tensorboard --logdir=tensorboard
 ```

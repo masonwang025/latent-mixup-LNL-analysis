@@ -35,8 +35,8 @@ def main():
                         help='input batch size for testing, default: 100')
     parser.add_argument('--epochs', type=int, default=30,
                         help='number of epochs to train, default: 10')
-    parser.add_argument('--lr', type=float, default=0.1,
-                        help='initial learning rate, default: 0.1')
+    parser.add_argument('--lr', type=float, default=0.01,
+                        help='initial learning rate, default: 0.01')
     parser.add_argument('--dataset', type=str, default='Spiral', choices=[
                         'spiral', 'mnist'], help='dataset to train on, default: spiral')
     parser.add_argument('--momentum', type=float, default=0.9,
@@ -62,8 +62,6 @@ def main():
                                 'Hidden-Dynamic' (adapted for hidden states from Dynamic)")
     parser.add_argument('--reg-term', type=float, default=0.,
                         help="Parameter of the regularization term, default: 0.")
-    parser.add_argument('--tb-dir', type=str, default=None,
-                        help="Tensorboard output directory, default: no Tensorboard support.")
 
     args = parser.parse_args()
 
@@ -120,9 +118,8 @@ def main():
 
     # tensorboard
 
-    if args.tb_dir:
-        tb = SummaryWriter(os.path.join(
-            "./", "tensorboard", args.tb_dir, "{0}-{1}".format(args.experiment_name, str(args.noise_level))))
+    tb = SummaryWriter(os.path.join(
+        "./", "tensorboard", "{0}-{1}".format(args.experiment_name, str(args.noise_level))))
 
     if not os.path.isdir(exp_path):
         os.makedirs(exp_path)
@@ -157,23 +154,22 @@ def main():
                 print("\t##### Doing HARD BETA bootstrapping and NORMAL mixup from the epoch {0} #####".format(
                     bootstrap_ep_mixup))
                 loss_per_epoch, acc_train_per_epoch_i = train_mixUp_HardBootBeta(args, model, device, train_loader, optimizer, epoch,
-                                                                                     alpha, bmm_model, bmm_model_maxLoss, bmm_model_minLoss, args.reg_term, num_classes)
+                                                                                 alpha, bmm_model, bmm_model_maxLoss, bmm_model_minLoss, args.reg_term, num_classes)
 
         ### Hidden State Mixup ###
         if args.Mixup == "Hidden":
-            alpha=args.alpha
+            alpha = args.alpha
             if epoch < bootstrap_ep_mixup:
                 print('\t##### Doing HIDDEN mixup for {0} epochs #####'.format(
                     bootstrap_ep_mixup - 1))
-                loss_per_epoch, acc_train_per_epoch_i=train_mixUp(
-                    args, model, device, train_loader, optimizer, epoch, 32, hidden_mixup = True)
+                loss_per_epoch, acc_train_per_epoch_i = train_mixUp(
+                    args, model, device, train_loader, optimizer, epoch, 32, hidden_mixup=True)
 
             else:
                 print("\t##### Doing HARD BETA bootstrapping and HIDDEN mixup from the epoch {0} #####".format(
                     bootstrap_ep_mixup))
-                loss_per_epoch, acc_train_per_epoch_i=train_mixUp_HardBootBeta(args, model, device, train_loader, optimizer, epoch,
-                                                                                 alpha, bmm_model, bmm_model_maxLoss, bmm_model_minLoss, args.reg_term, num_classes, hidden_mixup = True)
-
+                loss_per_epoch, acc_train_per_epoch_i = train_mixUp_HardBootBeta(args, model, device, train_loader, optimizer, epoch,
+                                                                                 alpha, bmm_model, bmm_model_maxLoss, bmm_model_minLoss, args.reg_term, num_classes, hidden_mixup=True)
 
         # tensorboard
         if tb:
@@ -182,8 +178,8 @@ def main():
             tb.flush()
 
         # Training tracking loss
-        epoch_losses_train, epoch_probs_train, argmaxXentropy_train, bmm_model, bmm_model_maxLoss, bmm_model_minLoss=track_training_loss(args, model, device, train_loader_track,
-                                epoch, bmm_model, bmm_model_maxLoss, bmm_model_minLoss)
+        epoch_losses_train, epoch_probs_train, argmaxXentropy_train, bmm_model, bmm_model_maxLoss, bmm_model_minLoss = track_training_loss(args, model, device, train_loader_track,
+                                                                                                                                           epoch, bmm_model, bmm_model_maxLoss, bmm_model_minLoss)
 
         # test
         loss_per_epoch, acc_val_per_epoch_i = test_cleaning(

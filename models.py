@@ -25,7 +25,7 @@ class SpiralModel(nn.Module):
     
     def forward(self, x, *, target=None, mixup=False, mixup_hidden=False, mixup_alpha=None, mixup_data=None, device='cuda'):
         if mixup_hidden:
-            layer_mix = random.randint(1, 4) # late mixup: random.randint(1, 4)
+            layer_mix = np.random.randint(0, 4)
         elif mixup:
             layer_mix = 0
         else:

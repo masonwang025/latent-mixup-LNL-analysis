@@ -30,7 +30,7 @@ def get_data_dataset_2(loader):
 # Noise without the sample class
 
 
-def add_noise_dataset_wo(loader, noise_percentage=20):
+def add_noise_dataset_wo(loader, noise_percentage=20, num_classes=2):
     torch.manual_seed(2)
     np.random.seed(42)
     noisy_labels = [
@@ -44,7 +44,7 @@ def add_noise_dataset_wo(loader, noise_percentage=20):
     for n, label_i in enumerate(noisy_labels):
         if idx_to_change[n] == 1:
             set_labels = list(
-                set(range(10)) - set([label_i]))  # this is a set with the available labels (without the current label)
+                set(range(num_classes)) - set([label_i]))  # this is a set with the available labels (without the current label)
             set_index = np.random.randint(len(set_labels))
             noisy_labels[n] = set_labels[set_index]
 
@@ -56,7 +56,7 @@ def add_noise_dataset_wo(loader, noise_percentage=20):
 # Noise with the sample class (as in Re-thinking generalization )
 
 
-def add_noise_dataset_w(loader, noise_percentage=20):
+def add_noise_dataset_w(loader, noise_percentage=20, num_classes=2):
     torch.manual_seed(2)
     np.random.seed(42)
     noisy_labels = [
@@ -70,7 +70,7 @@ def add_noise_dataset_w(loader, noise_percentage=20):
     for n, label_i in enumerate(noisy_labels):
         if idx_to_change[n] == 1:
             # this is a set with the available labels (with the current label)
-            set_labels = list(set(range(10)))
+            set_labels = list(set(range(num_classes)))
             set_index = np.random.randint(len(set_labels))
             noisy_labels[n] = set_labels[set_index]
 
