@@ -29,33 +29,6 @@ def get_data_dataset_2(loader):
 
 # Noise without the sample class
 
-
-def add_noise_dataset_wo(loader, noise_percentage=20, num_classes=2):
-    torch.manual_seed(2)
-    np.random.seed(42)
-    noisy_labels = [
-        sample_i for sample_i in loader.sampler.data_source.targets]
-    inputs = [sample_i for sample_i in loader.sampler.data_source.data]
-    probs_to_change = torch.randint(100, (len(noisy_labels),))
-    idx_to_change = probs_to_change >= (100.0 - noise_percentage)
-    percentage_of_bad_labels = 100 * \
-        (torch.sum(idx_to_change).item() / float(len(noisy_labels)))
-
-    for n, label_i in enumerate(noisy_labels):
-        if idx_to_change[n] == 1:
-            set_labels = list(
-                set(range(num_classes)) - set([label_i]))  # this is a set with the available labels (without the current label)
-            set_index = np.random.randint(len(set_labels))
-            noisy_labels[n] = set_labels[set_index]
-
-    loader.sampler.data_source.data = inputs
-    loader.sampler.data_source.targets = noisy_labels
-
-    return noisy_labels
-
-# Noise with the sample class (as in Re-thinking generalization )
-
-
 def add_noise_dataset_w(loader, noise_percentage=20, num_classes=2):
     torch.manual_seed(2)
     np.random.seed(42)
@@ -66,7 +39,6 @@ def add_noise_dataset_w(loader, noise_percentage=20, num_classes=2):
     idx_to_change = probs_to_change >= (100.0 - noise_percentage)
     percentage_of_bad_labels = 100 * \
         (torch.sum(idx_to_change).item() / float(len(noisy_labels)))
-
 
     for n, label_i in enumerate(noisy_labels):
         if idx_to_change[n] == 1:

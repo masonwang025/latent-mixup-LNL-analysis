@@ -12,7 +12,7 @@ DATASET="spiral"
 DATASETS_DIR="datasets"
 
 
-for NOISE_LEVEL in 0 20 50 80
+for NOISE_LEVEL in 20 50 80
 do
     printf "\nNOISE LEVEL OF $NOISE_LEVEL\n\n" 
 

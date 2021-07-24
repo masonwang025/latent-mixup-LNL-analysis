@@ -96,11 +96,6 @@ def main():
     test_loader = torch.utils.data.DataLoader(
         testset, batch_size=args.test_batch_size, shuffle=False, num_workers=1, pin_memory=True)
 
-    # EXECUTES WITHOUT ERROR FOR NOISE LEVEL of 0
-    # OTHERWISE AttributeError: 'int' object has no attribute 'numel'
-    for batch_idx, (data, target) in enumerate(train_loader):
-        print(batch_idx)
-
     milestones = args.M
 
     optimizer = optim.SGD(model.parameters(), lr=args.lr,
@@ -115,6 +110,11 @@ def main():
         train_loader, args.noise_level, num_classes)
     noisy_labels_track = add_noise_dataset_w(
         train_loader_track, args.noise_level, num_classes)
+
+    # EXECUTES WITHOUT ERROR FOR NOISE LEVEL of 0
+    # OTHERWISE AttributeError: 'int' object has no attribute 'numel'
+    for batch_idx, (data, target) in enumerate(train_loader):
+        print(batch_idx)
 
     # path where experiments are saved
     exp_path = os.path.join(
