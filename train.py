@@ -38,7 +38,7 @@ def main():
     parser.add_argument('--lr', type=float, default=0.01,
                         help='initial learning rate, default: 0.01')
     parser.add_argument('--dataset', type=str, default='Spiral', choices=[
-                        'spiral', 'mnist'], help='dataset to train on, default: spiral')
+                        'spiral'], help='dataset to train on, default: spiral')
     parser.add_argument('--momentum', type=float, default=0.9,
                         help='SGD momentum, default: 0.9')
     parser.add_argument('--no-cuda', action='store_true', default=False,
@@ -85,10 +85,6 @@ def main():
         trainset, trainset_track, testset = get_spiral_datasets(args.root_dir)
         model = models.SpiralModel().to(device)
         num_classes = 2
-    # elif args.dataset == 'mnist':
-    #     train_loader, train_loader_track, test_loader = get_mnist_loaders(args.root_dir,
-    #                                                                       args.batch_size, args.test_batch_size)
-    #     model = models.MNISTModel().to(device)
     else:
         raise NotImplementedError
 

@@ -1,17 +1,8 @@
 import torch
 import torch.nn as nn
 import numpy as np
-import enum
-
 
 LEAKY_RELU_ALPHA = 0.3
-
-
-class MixupMode(enum.Enum):
-    NO_MIXUP = 'no_mixup'
-    INPUT_MIXUP = 'input_mixup'
-    MANIFOLD_MIXUP = 'manifold_mixup'
-
 
 class SpiralModel(nn.Module):
     def __init__(self):
