@@ -46,7 +46,7 @@ def compare_svd_for_b12_models(models, x, y, classes=range(10), bottleneck_layer
         plt.show()
 
 
-def plot_spiral_dataset(x, y, title=None):
+def plot_spiral_dataset(x, y, title=None, legend=True):
     if title:
         plt.title(title)
     one = x[y == 0, :]
@@ -58,8 +58,9 @@ def plot_spiral_dataset(x, y, title=None):
     plt.ylim(-15, 15)
     plt.gca().set_aspect('equal', adjustable='box')
     plt.draw()
-
-    plt.legend()
+    
+    if legend:
+        plt.legend()
     plt.show()
 
 
@@ -79,9 +80,7 @@ def plot_spiral_model_confidence(model, x_train, y_train, title='spiral model'):
     im = plt.pcolormesh(x, y, confidence)  # vmin=0, vmax=1
     plt.colorbar(im)
 
-    plt.title(title)
-
-    plot_spiral_dataset(x_train, y_train)
+    plot_spiral_dataset(x_train, y_train, title, False)
 
 
 def one_hot_to_index_vector(v):
