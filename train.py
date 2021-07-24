@@ -82,7 +82,8 @@ def main():
 
     num_classes = None
     if args.dataset == 'spiral':
-        trainset, trainset_track, testset = get_spiral_datasets(args.datasets_dir)
+        trainset, trainset_track, testset = get_spiral_datasets(
+            args.datasets_dir)
         model = models.SpiralModel().to(device)
         num_classes = 2
     else:
@@ -110,7 +111,8 @@ def main():
     labels = get_data_dataset_2(train_loader_track)  # it should be "cloning"
 
     # it changes the labels in the train loader directly
-    noisy_labels = add_noise_dataset_w(train_loader, args.noise_level, num_classes)
+    noisy_labels = add_noise_dataset_w(
+        train_loader, args.noise_level, num_classes)
     noisy_labels_track = add_noise_dataset_w(
         train_loader_track, args.noise_level, num_classes)
 
@@ -195,39 +197,23 @@ def main():
 
         if epoch == 1:
             best_acc_val = acc_val_per_epoch_i[-1]
-            snapBest = 'best_epoch_%d_valLoss_%.5f_valAcc_%.5f_noise_%d_bestAccVal_%.5f' % (
-                epoch, loss_per_epoch[-1], acc_val_per_epoch_i[-1], args.noise_level, best_acc_val)
+            snapBest = 'best_epoch_%d' % (epoch)
             torch.save(model.state_dict(), os.path.join(
                 exp_path, snapBest + '.pth'))
-            torch.save(optimizer.state_dict(), os.path.join(
-                exp_path, 'opt_' + snapBest + '.pth'))
         else:
             if acc_val_per_epoch_i[-1] > best_acc_val:
                 best_acc_val = acc_val_per_epoch_i[-1]
 
                 if cont > 0:
                     try:
-                        os.remove(os.path.join(
-                            exp_path, 'opt_' + snapBest + '.pth'))
                         os.remove(os.path.join(exp_path, snapBest + '.pth'))
                     except OSError:
                         pass
-                snapBest = 'best_epoch_%d_valLoss_%.5f_valAcc_%.5f_noise_%d_bestAccVal_%.5f' % (
-                    epoch, loss_per_epoch[-1], acc_val_per_epoch_i[-1], args.noise_level, best_acc_val)
+                snapBest = 'best_epoch_%d' % (epoch)
                 torch.save(model.state_dict(), os.path.join(
                     exp_path, snapBest + '.pth'))
-                torch.save(optimizer.state_dict(), os.path.join(
-                    exp_path, 'opt_' + snapBest + '.pth'))
 
         cont += 1
-
-        if epoch == args.epochs:
-            snapLast = 'last_epoch_%d_valLoss_%.5f_valAcc_%.5f_noise_%d_bestValLoss_%.5f' % (
-                epoch, loss_per_epoch[-1], acc_val_per_epoch_i[-1], args.noise_level, best_acc_val)
-            torch.save(model.state_dict(), os.path.join(
-                exp_path, snapLast + '.pth'))
-            torch.save(optimizer.state_dict(), os.path.join(
-                exp_path, 'opt_' + snapLast + '.pth'))
 
 
 if __name__ == '__main__':
