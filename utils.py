@@ -48,7 +48,7 @@ def add_noise_dataset_w(loader, noise_percentage=20, num_classes=2):
             noisy_labels[n] = set_labels[set_index]
 
     loader.sampler.data_source.data = inputs
-    loader.sampler.data_source.targets = noisy_labels
+    loader.sampler.data_source.targets = torch.tensor(noisy_labels).float()
 
     return noisy_labels
 
