@@ -100,7 +100,6 @@ def main():
     # OTHERWISE AttributeError: 'int' object has no attribute 'numel'
     for batch_idx, (data, target) in enumerate(train_loader):
         print(batch_idx)
-        print("***************************************************")
 
     milestones = args.M
 

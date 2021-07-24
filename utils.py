@@ -155,7 +155,7 @@ def train_CrossEntropy(args, model, device, train_loader, optimizer, epoch):
         output = model(data)
         output = F.log_softmax(output, dim=1)
 
-        loss = F.nll_loss(output, target)
+        loss = F.nll_loss(output, target.long())
 
         loss.backward()
         optimizer.step()
