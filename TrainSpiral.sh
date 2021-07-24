@@ -9,8 +9,8 @@ do
     printf "\nNOISE LEVEL OF $i\n\n" 
 
     python3 train.py --Mixup 'Static' --experiment-name 'M-DYR-H' \
-	     --epochs 100 --M 25 75 --noise-level $i --reg-term 1 --dataset "spiral" --datasets-dir "datasets"
+	     --epochs 100 --M 25 75 --noise-level $i --reg-term 1 --lr 0.001 --dataset "spiral" --datasets-dir "datasets"
     
     python3 train.py --Mixup 'Hidden' --experiment-name 'LRM-DYR-H' \
-	    --epochs 100 --M 25 75 --noise-level $i --reg-term 1 --dataset "spiral" --datasets-dir "datasets"
+	    --epochs 100 --M 25 75 --noise-level $i --reg-term 1 --lr 0.001 --dataset "spiral" --datasets-dir "datasets"
 done

@@ -37,10 +37,11 @@ class SpiralDataset(torch.utils.data.Dataset):
                 self.data.append([float(data_x), float(data_y)])
                 self.targets.append(float(target))
 
-        self.data, self.targets = torch.Tensor(
-            self.data), torch.Tensor(self.targets)
+        self.data, self.targets = torch.tensor(
+            self.data), torch.tensor(self.targets)
 
     def __getitem__(self, index):
+        # print(type(self.targets[index]))
         return self.data[index], self.targets[index]
 
     def __len__(self):

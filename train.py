@@ -100,6 +100,7 @@ def main():
     # OTHERWISE AttributeError: 'int' object has no attribute 'numel'
     for batch_idx, (data, target) in enumerate(train_loader):
         print(batch_idx)
+        print("***************************************************")
 
     milestones = args.M
 
@@ -197,7 +198,8 @@ def main():
 
         if epoch == 1:
             best_acc_val = acc_val_per_epoch_i[-1]
-            snapBest = 'best_epoch_%d' % (epoch)
+            # snapBest = 'best_epoch_%d' % (epoch)
+            snapBest = 'best'
             torch.save(model.state_dict(), os.path.join(
                 exp_path, snapBest + '.pth'))
         else:
@@ -209,7 +211,8 @@ def main():
                         os.remove(os.path.join(exp_path, snapBest + '.pth'))
                     except OSError:
                         pass
-                snapBest = 'best_epoch_%d' % (epoch)
+                # snapBest = 'best_epoch_%d' % (epoch)
+                snapBest = 'best'
                 torch.save(model.state_dict(), os.path.join(
                     exp_path, snapBest + '.pth'))
 

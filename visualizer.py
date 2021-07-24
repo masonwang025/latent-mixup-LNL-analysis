@@ -46,12 +46,13 @@ def compare_svd_for_b12_models(models, x, y, classes=range(10), bottleneck_layer
         plt.show()
 
 
-def plot_spiral_dataset(x, y):
-    plt.title('Spiral dataset')
+def plot_spiral_dataset(x, y, title=None):
+    if title:
+        plt.title(title)
     one = x[y == 0, :]
     two = x[y == 1, :]
-    plt.scatter(*zip(*one), c='red', label='class 1')
-    plt.scatter(*zip(*two), c='darkorange', label='class 2')
+    plt.scatter(*zip(*one), c='deepskyblue', label='class 1')
+    plt.scatter(*zip(*two), c='goldenrod', label='class 2')
 
     plt.xlim(-15, 15)
     plt.ylim(-15, 15)
@@ -62,35 +63,25 @@ def plot_spiral_dataset(x, y):
     plt.show()
 
 
-def plot_spiral_model_confidence(model, train_loader, title='spiral model'):
-    x_train, y_train = next(iter(train_loader))
-    
+def plot_spiral_model_confidence(model, x_train, y_train, title='spiral model'):
     xi = np.arange(-15, 15, 0.1)
     xj = np.arange(-15, 15, 0.1)
     x_sample = np.array([[j, i] for i in xi for j in xj])
-    y = model(x_sample)
+    out = model(torch.tensor(x_sample))
+    out.shape
 
     # get P(Y=1|X)
-    confidence = torch.transpose(torch.nn.funtional.softmax(y))[1].numpy()
+    confidence = torch.transpose(torch.nn.functional.softmax(out, dim=1), 0, 1)[
+        1].detach().numpy()
     confidence = confidence.reshape((len(xi), len(xj)))
     x, y = np.meshgrid(xi, xj)
 
-    plt.pcolormesh(x, y, confidence)
-
-    def get_dim(x, y, dim=0, label_class=0, subset=500):
-        return x[y == label_class, dim][:subset]
-
-    y_train_class = utils.one_hot_to_index_vector(y_train)
-    x_d0_l0 = get_dim(x_train, y_train_class, dim=0, label_class=0)
-    x_d1_l0 = get_dim(x_train, y_train_class, dim=1, label_class=0)
-    x_d0_l1 = get_dim(x_train, y_train_class, dim=0, label_class=1)
-    x_d1_l1 = get_dim(x_train, y_train_class, dim=1, label_class=1)
+    im = plt.pcolormesh(x, y, confidence)  # vmin=0, vmax=1
+    plt.colorbar(im)
 
     plt.title(title)
-    plt.plot(x_d0_l0, x_d1_l0, '.', label='class 0')
-    plt.plot(x_d0_l1, x_d1_l1, '.', label='class 1')
-    plt.colorbar()
-    plt.show()
+
+    plot_spiral_dataset(x_train, y_train)
 
 
 def one_hot_to_index_vector(v):
@@ -110,6 +101,6 @@ def get_hidden_representation_for_class(bottleneck_representation, y, c, subset=
     indices = [i for i, y_i in enumerate(y) if y_i in c]
     indices = indices[:subset] if subset else indices
     y = torch.gather(y, indices)
-    bottleneck_representation = torch.gather(bottleneck_representation, indices)
+    bottleneck_representation = torch.gather(
+        bottleneck_representation, indices)
     return bottleneck_representation, y
-
