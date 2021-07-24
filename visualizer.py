@@ -47,10 +47,17 @@ def compare_svd_for_b12_models(models, x, y, classes=range(10), bottleneck_layer
 
 
 def plot_spiral_dataset(x, y):
-    y = utils.one_hot_to_index_vector(y)
     plt.title('Spiral dataset')
-    plt.plot(x[y == 0, 0], x[y == 0, 1], '.', label='class 1')
-    plt.plot(x[y == 1, 0], x[y == 1, 1], '.', label='class 2')
+    one = x[y == 0, :]
+    two = x[y == 1, :]
+    plt.scatter(*zip(*one), c='red', label='class 1')
+    plt.scatter(*zip(*two), c='darkorange', label='class 2')
+
+    plt.xlim(-15, 15)
+    plt.ylim(-15, 15)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.draw()
+
     plt.legend()
     plt.show()
 
