@@ -46,25 +46,29 @@ def compare_svd_for_b12_models(models, x, y, classes=range(10), bottleneck_layer
         plt.show()
 
 
-def plot_spiral_dataset(x, y, title=None, legend=True):
+def plot_spiral_dataset(x, y, title=None, legend=True, ax=None):
     if title:
         plt.title(title)
     one = x[y == 0, :]
     two = x[y == 1, :]
-    plt.scatter(*zip(*one), c='deepskyblue', label='class 1')
-    plt.scatter(*zip(*two), c='goldenrod', label='class 2')
+    if ax:
+        ax.scatter(*zip(*one), c='deepskyblue', label='class 1')
+        ax.scatter(*zip(*two), c='goldenrod', label='class 2')
+    else:
+        plt.scatter(*zip(*one), c='deepskyblue', label='class 1')
+        plt.scatter(*zip(*two), c='goldenrod', label='class 2')
 
-    plt.xlim(-15, 15)
-    plt.ylim(-15, 15)
-    plt.gca().set_aspect('equal', adjustable='box')
-    plt.draw()
-    
-    if legend:
-        plt.legend()
-    plt.show()
+        plt.xlim(-15, 15)
+        plt.ylim(-15, 15)
+        plt.gca().set_aspect('equal', adjustable='box')
+        plt.draw()
+        
+        if legend:
+            plt.legend()
+        plt.show()
 
 
-def plot_spiral_model_confidence(model, x_train, y_train, title='spiral model'):
+def plot_spiral_model_confidence(model, x_train, y_train, title='spiral model', ax=None):
     xi = np.arange(-15, 15, 0.1)
     xj = np.arange(-15, 15, 0.1)
     x_sample = np.array([[j, i] for i in xi for j in xj])
@@ -77,10 +81,13 @@ def plot_spiral_model_confidence(model, x_train, y_train, title='spiral model'):
     confidence = confidence.reshape((len(xi), len(xj)))
     x, y = np.meshgrid(xi, xj)
 
-    im = plt.pcolormesh(x, y, confidence)  # vmin=0, vmax=1
-    plt.colorbar(im)
-
-    plot_spiral_dataset(x_train, y_train, title, False)
+    if ax:
+        ax.pcolormesh(x, y, confidence)
+        plot_spiral_dataset(x_train, y_train, title, False, ax=ax)
+    else:
+        im = plt.pcolormesh(x, y, confidence)  # vmin=0, vmax=1
+        plt.colorbar(im)
+        plot_spiral_dataset(x_train, y_train, title, False)
 
 
 def one_hot_to_index_vector(v):

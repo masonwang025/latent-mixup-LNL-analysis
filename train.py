@@ -111,11 +111,6 @@ def main():
     noisy_labels_track = add_noise_dataset_w(
         train_loader_track, args.noise_level, num_classes)
 
-    # EXECUTES WITHOUT ERROR FOR NOISE LEVEL of 0
-    # OTHERWISE AttributeError: 'int' object has no attribute 'numel'
-    for batch_idx, (data, target) in enumerate(train_loader):
-        print(batch_idx)
-
     # path where experiments are saved
     exp_path = os.path.join(
         './', 'noise_models', '{0}_{1}'.format(args.dataset, args.experiment_name), str(args.noise_level))
