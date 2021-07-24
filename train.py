@@ -95,6 +95,11 @@ def main():
     test_loader = torch.utils.data.DataLoader(
         testset, batch_size=args.test_batch_size, shuffle=False, num_workers=1, pin_memory=True)
 
+    # EXECUTES WITHOUT ERROR FOR NOISE LEVEL of 0
+    # OTHERWISE AttributeError: 'int' object has no attribute 'numel'
+    for batch_idx, (data, target) in enumerate(train_loader):
+        print(batch_idx)
+
     milestones = args.M
 
     optimizer = optim.SGD(model.parameters(), lr=args.lr,
@@ -103,6 +108,7 @@ def main():
         optimizer, milestones=milestones, gamma=0.1)
 
     labels = get_data_dataset_2(train_loader_track)  # it should be "cloning"
+
     # it changes the labels in the train loader directly
     noisy_labels = add_noise_dataset_w(train_loader, args.noise_level, num_classes)
     noisy_labels_track = add_noise_dataset_w(

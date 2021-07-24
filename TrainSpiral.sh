@@ -4,7 +4,7 @@
 
 # tensorboard --logdir=runs &
 
-for i in 20 50 80
+for i in 0 20 50 80
 do
     printf "\nNOISE LEVEL OF $i\n\n" 
 
