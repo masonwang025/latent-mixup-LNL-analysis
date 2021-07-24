@@ -40,13 +40,8 @@ class SpiralDataset(torch.utils.data.Dataset):
         self.data, self.targets = torch.Tensor(
             self.data), torch.Tensor(self.targets)
 
-        self.indices = torch.arange(0, self.data.shape[0])
-
-        if train:
-            np.random.shuffle(self.indices)
-
     def __getitem__(self, index):
-        return self.data[self.indices[index]], self.targets[self.indices[index]]
+        return self.data[index], self.targets[index]
 
     def __len__(self):
-        return len(self.indices)
+        return len(self.targets)
