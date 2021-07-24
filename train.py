@@ -27,8 +27,8 @@ def main():
     # Training settings
     parser = argparse.ArgumentParser(
         description='Analyzing hidden states when training with mixup on latent representations for LNL.')
-    parser.add_argument('--root-dir', type=str, default='.',
-                        help='path to where datasets located. If the datasets are not downloaded, they will automatically be and extracted to this path, default: .')
+    parser.add_argument('--datasets-dir', type=str, default='datasets',
+                        help='path to where datasets located. If the datasets are not downloaded, they will automatically be and extracted to this path, default: datasets')
     parser.add_argument('--batch-size', type=int, default=128,
                         help='input batch size for training, default: 128')
     parser.add_argument('--test-batch-size', type=int, default=100,
@@ -55,7 +55,7 @@ def main():
                         help='alpha parameter for the mixup distribution, default: 32')
     parser.add_argument('--M', nargs='+', type=int, default=[30, 60],
                         help="Milestones for the LR sheduler, default 30 60")
-    parser.add_argument('--Mixup', type=str, default='None', choices=['None', 'Static', 'Hidden', 'Dynamic', 'Hidden-Dynamic'],
+    parser.add_argument('--Mixup', type=str, default='None', choices=['None', 'Static', 'Hidden'],
                         help="Type of bootstrapping. Available: 'None' (deactivated)(default), \
                                 'Static' (as in the paper), 'Hidden' (adapted for hidden states from Static) \
                                 'Dynamic' (BMM to mix the smaples, will use decreasing softmax), default: None \
@@ -82,7 +82,7 @@ def main():
 
     num_classes = None
     if args.dataset == 'spiral':
-        trainset, trainset_track, testset = get_spiral_datasets(args.root_dir)
+        trainset, trainset_track, testset = get_spiral_datasets(args.datasets_dir)
         model = models.SpiralModel().to(device)
         num_classes = 2
     else:
@@ -104,9 +104,9 @@ def main():
 
     labels = get_data_dataset_2(train_loader_track)  # it should be "cloning"
     # it changes the labels in the train loader directly
-    noisy_labels = add_noise_dataset_w(train_loader, args.noise_level)
+    noisy_labels = add_noise_dataset_w(train_loader, args.noise_level, num_classes)
     noisy_labels_track = add_noise_dataset_w(
-        train_loader_track, args.noise_level)
+        train_loader_track, args.noise_level, num_classes)
 
     # path where experiments are saved
     exp_path = os.path.join(

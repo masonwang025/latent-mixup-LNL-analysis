@@ -257,7 +257,7 @@ def train_mixUp(args, model, device, train_loader, optimizer, epoch, alpha, *, h
 # Mixup with hard bootstrapping using the beta model
 
 
-def reg_loss_class(mean_tab, num_classes=10):
+def reg_loss_class(mean_tab, num_classes=2):
     loss = 0
     for items in mean_tab:
         loss += (1./num_classes)*torch.log((1./num_classes)/items)
