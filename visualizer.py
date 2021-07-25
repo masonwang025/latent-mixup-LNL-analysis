@@ -46,7 +46,7 @@ def compare_svd_for_b12_models(models, x, y, classes=range(10), bottleneck_layer
         plt.show()
 
 
-def plot_spiral_dataset(x, y, title=None, legend=True, ax=None):
+def plot_spiral_dataset(x, y, title=None, legend=True, ax=None, save_fig=False, save_fig_final=False):
     if title:
         plt.title(title)
     one = x[y == 0, :]
@@ -65,10 +65,16 @@ def plot_spiral_dataset(x, y, title=None, legend=True, ax=None):
         
         if legend:
             plt.legend()
+
+        if save_fig_final:
+                plt.savefig(os.path.join('results', 'spiral_dataset.pdf'))
+        elif save_fig:
+                plt.savefig(os.path.join("results", 'spiral_dataset.png'), dpi=300)
+
         plt.show()
 
 
-def plot_spiral_model_confidence(model, x_train, y_train, title='spiral model', ax=None):
+def plot_spiral_model_confidence(model, x_train, y_train, title='spiral model', ax=None, save_fig=False, save_fig_final=False):
     xi = np.arange(-15, 15, 0.1)
     xj = np.arange(-15, 15, 0.1)
     x_sample = np.array([[j, i] for i in xi for j in xj])
@@ -88,6 +94,11 @@ def plot_spiral_model_confidence(model, x_train, y_train, title='spiral model', 
         im = plt.pcolormesh(x, y, confidence)  # vmin=0, vmax=1
         plt.colorbar(im)
         plot_spiral_dataset(x_train, y_train, title, False)
+    
+    if save_fig_final:
+            plt.savefig(os.path.join('results', 'spiral_confidence.pdf'))
+    elif save_fig:
+            plt.savefig(os.path.join("results", 'spiral_confidence.png'), dpi=300)
 
 
 def one_hot_to_index_vector(v):
