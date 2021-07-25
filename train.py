@@ -29,8 +29,8 @@ def main():
         description='Analyzing hidden states when training with mixup on latent representations for LNL.')
     parser.add_argument('--datasets-dir', type=str, default='datasets',
                         help='path to where datasets located. If the datasets are not downloaded, they will automatically be and extracted to this path, default: datasets')
-    parser.add_argument('--batch-size', type=int, default=128,
-                        help='input batch size for training, default: 128')
+    parser.add_argument('--batch-size', type=int, default=24,
+                        help='input batch size for training, default: 24')
     parser.add_argument('--test-batch-size', type=int, default=100,
                         help='input batch size for testing, default: 100')
     parser.add_argument('--epochs', type=int, default=30,
