@@ -99,9 +99,9 @@ def main():
     milestones = args.M
 
     optimizer = optim.SGD(model.parameters(), lr=args.lr,
-                          momentum=args.momentum, weight_decay=1e-4)
+                          momentum=args.momentum)  # , weight_decay=1e-4
     scheduler = optim.lr_scheduler.MultiStepLR(
-        optimizer, milestones=milestones, gamma=0.1)
+        optimizer, milestones=milestones, gamma=0.01)
 
     labels = get_data_dataset_2(train_loader_track)  # it should be "cloning"
 

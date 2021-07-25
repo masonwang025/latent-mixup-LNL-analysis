@@ -6,15 +6,15 @@ import numpy as np
 class SpiralModel(nn.Module):
     def __init__(self):
         super().__init__()
-        self.layer1 = nn.Sequential(nn.Linear(2, 1024), torch.nn.ReLU())
-        self.layer2 = nn.Sequential(nn.Linear(1024, 1024), torch.nn.ReLU())
+        self.layer1 = nn.Sequential(nn.Linear(4, 16), torch.nn.Tanh())
+        self.layer2 = nn.Sequential(nn.Linear(16, 24), torch.nn.Tanh())
         self.layer3 = nn.Sequential(
-            nn.Linear(1024, 1024), torch.nn.ReLU())
+            nn.Linear(24, 24), torch.nn.Tanh())
         self.layer4 = nn.Sequential(
-            nn.Linear(1024, 1024), torch.nn.ReLU())
+            nn.Linear(24, 24), torch.nn.Tanh())
         self.layer5 = nn.Sequential(
-            nn.Linear(1024, 1024), torch.nn.ReLU())
-        self.layer6 = nn.Sequential(nn.Linear(1024, 2), torch.nn.ReLU())
+            nn.Linear(24, 16), torch.nn.Tanh())
+        self.layer6 = nn.Sequential(nn.Linear(16, 2), torch.nn.Tanh())
 
     def forward(self, x, *, target=None, layer_mix=None, mixup_alpha=None, mixup_data=None, device='cuda'):
         out = x.float()

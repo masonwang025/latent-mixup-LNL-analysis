@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import torch
 import utils
 from collections import defaultdict
+import math
 import os
 
 
@@ -50,8 +51,8 @@ def compare_svd_for_b12_models(models, x, y, classes=range(10), bottleneck_layer
 def plot_spiral_dataset(x, y, title=None, legend=True, ax=None, save_fig=False, save_fig_final=False):
     if title:
         plt.title(title)
-    one = x[y == 0, :]
-    two = x[y == 1, :]
+    one = x[y == 0, :2]
+    two = x[y == 1, :2]
     if ax:
         ax.scatter(*zip(*one), c='deepskyblue', label='class 1')
         ax.scatter(*zip(*two), c='goldenrod', label='class 2')
@@ -78,9 +79,8 @@ def plot_spiral_dataset(x, y, title=None, legend=True, ax=None, save_fig=False, 
 def plot_spiral_model_confidence(model, x_train, y_train, title=None, ax=None, save_fig=False, save_fig_final=False):
     xi = np.arange(-15, 15, 0.1)
     xj = np.arange(-15, 15, 0.1)
-    x_sample = np.array([[j, i] for i in xi for j in xj])
+    x_sample = np.array([[j, i, math.cos(j), math.sin(i)] for i in xi for j in xj])
     out = model(torch.tensor(x_sample))
-    out.shape
 
     # get P(Y=1|X)
     confidence = torch.transpose(torch.nn.functional.softmax(out, dim=1), 0, 1)[

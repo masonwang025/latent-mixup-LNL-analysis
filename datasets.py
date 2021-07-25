@@ -2,22 +2,13 @@ import torch
 from torchvision import datasets, transforms
 import numpy as np
 import os
+import math
 
 
 def get_spiral_datasets(dir):
     trainset = SpiralDataset(dir, train=True)
     trainset_track = SpiralDataset(dir, train=True)
     testset = SpiralDataset(dir, train=False)
-    return trainset, trainset_track, testset
-
-
-def get_mnist_datasets(dir):
-    trainset = datasets.MNIST(
-        root=dir, train=True, download=True, transform=transforms.ToTensor())
-    trainset_track = datasets.MNIST(
-        root=dir, train=True, transform=transforms.ToTensor())
-    testset = datasets.MNIST(
-        root=dir, train=False, transform=transforms.ToTensor())
     return trainset, trainset_track, testset
 
 
@@ -34,7 +25,9 @@ class SpiralDataset(torch.utils.data.Dataset):
         with open(dataset_file, 'r') as f:
             for line in f:
                 data_x, data_y, target = line.split(' ')
-                self.data.append([float(data_x), float(data_y)])
+                data_x, data_y = float(data_x), float(data_y)
+                self.data.append([data_x, data_y, float(
+                    math.cos(data_x)), float(math.sin(data_y))])
                 self.targets.append(float(target))
 
         self.data, self.targets = torch.tensor(
