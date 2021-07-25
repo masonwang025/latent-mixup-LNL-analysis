@@ -181,7 +181,7 @@ def mixup_criterion(pred, y_a, y_b, lam):
     return lam * F.nll_loss(pred, y_a.long()) + (1 - lam) * F.nll_loss(pred, y_b.long())
 
 
-def train_mixUp(args, model, device, train_loader, optimizer, epoch, alpha, *, hidden_mixup=False):
+def train_mixUp(args, model, device, train_loader, optimizer, epoch, alpha, *, layer_mix_bounds=(0, 1)):
     model.train()
     loss_per_batch = []
 
@@ -191,12 +191,9 @@ def train_mixUp(args, model, device, train_loader, optimizer, epoch, alpha, *, h
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
 
-        if hidden_mixup == True:
-            output, targets_a, targets_b, lam, _ = model(
-                data, target=target, mixup_hidden=True, mixup_alpha=alpha, mixup_data=mixup_data, device=device)
-        else:
-            output, targets_a, targets_b, lam, _ = model(
-                data, target=target, mixup=True, mixup_alpha=alpha, mixup_data=mixup_data, device=device)
+        layer_mix = np.random.randint(layer_mix_bounds[0], layer_mix_bounds[1])
+        output, targets_a, targets_b, lam, _ = model(
+            data, target=target, layer_mix=layer_mix, mixup_alpha=alpha, mixup_data=mixup_data, device=device)
 
         output = F.log_softmax(output, dim=1)
         loss = mixup_criterion(output, targets_a, targets_b, lam)
@@ -238,7 +235,7 @@ def reg_loss_class(mean_tab, num_classes=2):
 
 
 def train_mixUp_HardBootBeta(args, model, device, train_loader, optimizer, epoch, alpha, bmm_model,
-                             bmm_model_maxLoss, bmm_model_minLoss, reg_term, num_classes, *, hidden_mixup=False):
+                             bmm_model_maxLoss, bmm_model_minLoss, reg_term, num_classes, *, layer_mix_bounds=(0, 1)):
     model.train()
     loss_per_batch = []
 
@@ -252,14 +249,11 @@ def train_mixUp_HardBootBeta(args, model, device, train_loader, optimizer, epoch
         output_x1 = model(data)
         output_x1.detach_()
         optimizer.zero_grad()
-
-        if hidden_mixup == True:
-            output, targets_1, targets_2, lam, index = model(
-                data, target=target, mixup_hidden=True, mixup_alpha=alpha, mixup_data=mixup_data, device=device)
-        else:
-            output, targets_1, targets_2, lam, index = model(
-                data, target=target, mixup=True, mixup_alpha=alpha, mixup_data=mixup_data, device=device)
-
+        
+        layer_mix = np.random.randint(layer_mix_bounds[0], layer_mix_bounds[1])
+        output, targets_1, targets_2, lam, index = model(
+            data, target=target, layer_mix=layer_mix, mixup_alpha=alpha, mixup_data=mixup_data, device=device)
+        
         output_mean = F.softmax(output, dim=1)
         tab_mean_class = torch.mean(output_mean, -2)
         output = F.log_softmax(output, dim=1)

@@ -55,11 +55,11 @@ def main():
                         help='alpha parameter for the mixup distribution, default: 32')
     parser.add_argument('--M', nargs='+', type=int, default=[30, 60],
                         help="Milestones for the LR sheduler, default 30 60")
-    parser.add_argument('--Mixup', type=str, default='None', choices=['None', 'Static', 'Hidden'],
+    parser.add_argument('--Mixup', type=str, default='None', choices=['None', 'True'],
                         help="Type of bootstrapping. Available: 'None' (deactivated)(default), \
-                                'Static' (as in the paper), 'Hidden' (adapted for hidden states from Static) \
-                                'Dynamic' (BMM to mix the smaples, will use decreasing softmax), default: None \
-                                'Hidden-Dynamic' (adapted for hidden states from Dynamic)")
+                                'True' (specify layer mix bounds)")
+    parser.add_argument('--layer-mix-bounds', nargs='+', type=int, default=[0, 1],
+                        help="Start and end for mixup layer bounds (start inclusive, end exclusive).")
     parser.add_argument('--reg-term', type=float, default=0.,
                         help="Parameter of the regularization term, default: 0.")
 
@@ -139,36 +139,28 @@ def main():
             loss_per_epoch, acc_train_per_epoch_i = train_CrossEntropy(
                 args, model, device, train_loader, optimizer, epoch)
 
-        ### Mixup ###
+        ### NORMAL/HIDDEN Mixup ###
         # just analyze with M-DYR-H and latent space variations of it
-        if args.Mixup == "Static":
+        if args.Mixup == "True":
             alpha = args.alpha
+            layer_mix_bounds = tuple(args.layer_mix_bounds)
+
+            mixup_description = "HIDDEN ({0}-{1})".format(
+                layer_mix_bounds[0], layer_mix_bounds[1])
+            if (layer_mix_bounds[0] == 0) and (layer_mix_bounds[1] == 1):
+                mixup_description = "NORMAL"
+
             if epoch < bootstrap_ep_mixup:
-                print('\t##### Doing NORMAL mixup for {0} epochs #####'.format(
-                    bootstrap_ep_mixup - 1))
+                print('\t##### Doing {0} mixup for {1} epochs #####'.format(mixup_description,
+                                                                            bootstrap_ep_mixup - 1))
                 loss_per_epoch, acc_train_per_epoch_i = train_mixUp(
-                    args, model, device, train_loader, optimizer, epoch, 32)
+                    args, model, device, train_loader, optimizer, epoch, 32, layer_mix_bounds=layer_mix_bounds)
 
             else:
-                print("\t##### Doing HARD BETA bootstrapping and NORMAL mixup from the epoch {0} #####".format(
-                    bootstrap_ep_mixup))
+                print("\t##### Doing HARD BETA bootstrapping and {0} mixup from the epoch {1} #####".format(mixup_description,
+                                                                                                            bootstrap_ep_mixup))
                 loss_per_epoch, acc_train_per_epoch_i = train_mixUp_HardBootBeta(args, model, device, train_loader, optimizer, epoch,
-                                                                                 alpha, bmm_model, bmm_model_maxLoss, bmm_model_minLoss, args.reg_term, num_classes)
-
-        ### Hidden State Mixup ###
-        if args.Mixup == "Hidden":
-            alpha = args.alpha
-            if epoch < bootstrap_ep_mixup:
-                print('\t##### Doing HIDDEN mixup for {0} epochs #####'.format(
-                    bootstrap_ep_mixup - 1))
-                loss_per_epoch, acc_train_per_epoch_i = train_mixUp(
-                    args, model, device, train_loader, optimizer, epoch, 32, hidden_mixup=True)
-
-            else:
-                print("\t##### Doing HARD BETA bootstrapping and HIDDEN mixup from the epoch {0} #####".format(
-                    bootstrap_ep_mixup))
-                loss_per_epoch, acc_train_per_epoch_i = train_mixUp_HardBootBeta(args, model, device, train_loader, optimizer, epoch,
-                                                                                 alpha, bmm_model, bmm_model_maxLoss, bmm_model_minLoss, args.reg_term, num_classes, hidden_mixup=True)
+                                                                                 alpha, bmm_model, bmm_model_maxLoss, bmm_model_minLoss, args.reg_term, num_classes, layer_mix_bounds=layer_mix_bounds)
 
         # tensorboard
         if tb:
