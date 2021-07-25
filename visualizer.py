@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import torch
 import utils
 from collections import defaultdict
+import os
 
 
 def plot_bottleneck_representation(bottleneck_representation, y):
@@ -74,7 +75,7 @@ def plot_spiral_dataset(x, y, title=None, legend=True, ax=None, save_fig=False, 
         plt.show()
 
 
-def plot_spiral_model_confidence(model, x_train, y_train, title='spiral model', ax=None, save_fig=False, save_fig_final=False):
+def plot_spiral_model_confidence(model, x_train, y_train, title=None, ax=None, save_fig=False, save_fig_final=False):
     xi = np.arange(-15, 15, 0.1)
     xj = np.arange(-15, 15, 0.1)
     x_sample = np.array([[j, i] for i in xi for j in xj])

@@ -6,8 +6,8 @@ import numpy as np
 class SpiralModel(nn.Module):
     def __init__(self):
         super().__init__()
-        self.layer1 = nn.Sequential(nn.Linear(2, 256), torch.nn.LeakyReLU())
-        self.layer2 = nn.Sequential(nn.Linear(256, 1024), torch.nn.LeakyReLU())
+        self.layer1 = nn.Sequential(nn.Linear(2, 1024), torch.nn.LeakyReLU())
+        self.layer2 = nn.Sequential(nn.Linear(1024, 1024), torch.nn.LeakyReLU())
         self.layer3 = nn.Sequential(
             nn.Linear(1024, 1024), torch.nn.LeakyReLU())
         self.layer4 = nn.Sequential(
